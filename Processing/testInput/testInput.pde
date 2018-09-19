@@ -1,24 +1,61 @@
 
-
 import controlP5.*;
 import processing.serial.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+
 
 ControlP5 cp5;
 
 Button on_button;
 DropdownList d1, d2 , d3;
 DropdownList ind[] = {};
-
+char c = '0';
 int cnt = 0;
 Serial myPort; 
 String val = "0";     // Data received from the serial port
+////////////////////////////////////////////////////////////////
+class Timer {
+ 
+  int savedTime; // When Timer started
+  int totalTime; // How long Timer should last
+  
+  Timer(int tempTotalTime) {
+    totalTime = tempTotalTime;
+  }
+  
+  // Starting the timer
+  void start() {
+    // When the timer starts it stores the current time in milliseconds.
+    savedTime = millis(); 
+  }
+  
+  // The function isFinished() returns true if 5,000 ms have passed. 
+  // The work of the timer is farmed out to this method.
+  boolean isFinished() { 
+    // Check how much time has passed
+    int passedTime = millis()- savedTime;
+    if (passedTime > totalTime) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+}
+////////////////////////////////////////////////////////////////
+Timer timer;
 
 void setup() {
+  timer = new Timer(3000);
+  
   size(700, 400 );
   noStroke();
   cp5 = new ControlP5(this);
+  
+  
+  
+  
   
   // DropdownList is DEPRECATED, 
   // use ScrollableList instead, 
@@ -26,8 +63,6 @@ void setup() {
 
   String portName = Serial.list()[0]; //change the 0 to a 1 or 2 etc. to match your port
   myPort = new Serial(this, portName, 9600);
-
-
   // create a DropdownList, 
   
           
@@ -57,10 +92,6 @@ void setup() {
   
 
           
-   
-  
-  
-  
   cp5.addButton("submit")
      .setValue(1)
      .setPosition(300,300)
@@ -68,6 +99,7 @@ void setup() {
      ;
   
 }
+
 
 
 void customize(DropdownList ddl) {
@@ -193,7 +225,29 @@ String dataAll = "";
   for(int i=0; i<3 ;i++){dataAll += data[i]+"-";}
   //println("All : " + dataAll);
   
-  dataAll2 = dataAll;
+  if(dataAll.length()<=10){
+  dataAll2 = "0"+dataAll.length()+dataAll;}
+  else{dataAll2 = dataAll+dataAll.length();}
+}
+
+
+
+public void submit() {
+  c = val.charAt(0);
+  myPort.write(dataAll2);      
+  println("Send Data :" + dataAll2);  
+  println("val : " + val);
+
+  println("Wait.");
+  //println(int(val));
+  //println(val.length());
+  
+  if(c == '1'){
+    timer.start();
+  }
+  
+ val = "0";
+
 }
 
 void draw() {
@@ -203,20 +257,16 @@ void draw() {
   {  // If data is available,
     val = myPort.readStringUntil('\n');         // read it and store it in val
   } 
-  
-}
-
-public void submit() {
-  char c = val.charAt(0);
-  myPort.write(dataAll2);         //send a 1
-  println("Send Data :" + dataAll2);  
-  println("val : " + val);
-  if(c == '1'){println("Write Success."); }
-  else{println("Wait.");}
-  //println(int(val));
-  //println(val.length());
-
-
-
-  
+  /*if(timer.isFinished()){//println("5555");
+  setup();
+  }*/
+  if(c == '1'){
+    textSize(10); text("Complete!",333,335); 
+    
+      if(timer.isFinished())
+      {
+        submit();
+      }
+    }
+    
 }

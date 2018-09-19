@@ -12,9 +12,7 @@ NfcAdapter nfc = NfcAdapter(pn532spi);
 #include <PN532_I2C.h>
 #include <PN532.h>
 #include <NfcAdapter.h>
-
 String var = "000";
-
 PN532_I2C pn532_i2c(Wire);
 NfcAdapter nfc = NfcAdapter(pn532_i2c);
 #endif
@@ -27,10 +25,10 @@ void setup() {
 
 void loop() {
 
-   if (Serial.available()) 
-   { // If data is available to read,
+   //if (Serial.available()) 
+   //{ // If data is available to read,
      var = Serial.readString(); // read it and store it in val
-   }
+   //}
    
     //Serial.println("\nPlace a formatted Mifare Classic NFC tag on the reader.");
     if (nfc.tagPresent()) {
